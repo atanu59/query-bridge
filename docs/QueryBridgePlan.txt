@@ -1,0 +1,28 @@
+my pc has Ryzen5 U processor and no graphics card with 8GB of ram it can run more than gwen2.5:3b parameter model so plz suggest should I use locally running AI or cloud AI service
+
+don't give all the code at once.. give it and along the way also explain to me how what works 
+
+I don't know much abt git GitHub but I want to learn use it this time keep track of my progress  
+
+QUERYBRIDE PROJECT PROGRESSION PLAN
+
+PHASE 1:
+        a. develop the backend endpoints with flask and a single pre-existing Database in Postgres (can use Postman for checking connections)
+        b. Connect the local AI model or cloud AI model with backend 
+        c. pass the prompt(user generated + backend prompt passed by postman for now) to the AI and validate its Ans (is proper SQL or NOT)
+        d. after validation pass the query to the database (with safety measures of-course like limit for how much data at a given time so my poor pc or application doesn't crash with large amount of data )
+        e. develop the UI using React with input field and a display block and other options like refresh or clear display 
+        f. main objective is to make the response time as fast as possible without hampering the accuracy and correctness of the output( AI must not hallucinate... as long as we can avoid that )
+        
+PHASE 2:
+        a. Now we have multiple databases in Postgres.. we make a separate meta-Database which stores the schema and information relevant to the multiple databases which we will include in our backend and frontend 
+        b. from the frontend we will have a selection option for available Databases from there the when the user sends a query the backend will get the meta data from the meta-database abt the database selected and send prompt to the AI accordingly
+        c. We can also add a Page to Add new databases in the meta-database for an existing database which is present in the Postgres(providing the relevant meta data of the database to be added)
+        d. main objective is to make the response time as fast as possible without hampering the accuracy and correctness of the output( AI must not hallucinate... as long as we can avoid that )
+
+PHASE 3:( I will add more in this later)
+        a. add authentication page(user and admin)
+        b. history page 
+        
+   
+         
