@@ -1,122 +1,110 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+
+const API_URL = "http://127.0.0.1:5000/api/query";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [question, setQuestion] = useState("");
+  const [lastQuestion, setLastQuestion] = useState("");
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function runQuery(q) {
+    if (!q.trim()) {
+      setError("Please enter a question.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setResult(null);
+    setLastQuestion(q);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q }),
+      });
+      const data = await response.json();
+      if (data.ok) {
+        setResult(data);
+      } else {
+        setError(data.error);
+        if (data.sql) setResult({ sql: data.sql });
+      }
+    } catch {
+      setError("Could not reach the server. Is Flask running?");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleClear() {
+    setQuestion("");
+    setLastQuestion("");
+    setResult(null);
+    setError("");
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div className="container">
+      <h1>Query Bridge</h1>
+      <p className="subtitle">Ask your database a question in plain English.</p>
+
+      <div className="input-row">
+        <input
+          type="text"
+          value={question}
+          placeholder="e.g. Which customers placed orders over 500?"
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && runQuery(question)}
+        />
+        <button onClick={() => runQuery(question)} disabled={loading}>
+          {loading ? "Running..." : "Run"}
         </button>
-      </section>
+        <button onClick={() => runQuery(lastQuestion)} disabled={loading || !lastQuestion}>
+          Refresh
+        </button>
+        <button onClick={handleClear} disabled={loading}>
+          Clear
+        </button>
+      </div>
 
-      <div className="ticks"></div>
+      {error && <div className="error">{error}</div>}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {result?.sql && (
+        <div className="sql-box">
+          <strong>Generated SQL</strong>
+          <pre>{result.sql}</pre>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {result?.ok && (
+        <div className="table-wrap">
+          <p>{result.row_count} row(s)</p>
+          <table>
+            <thead>
+              <tr>
+                {result.columns.map((col) => (
+                  <th key={col}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {result.rows.map((row, i) => (
+                <tr key={i}>
+                  {row.map((cell, j) => (
+                    <td key={j}>{cell === null ? "NULL" : String(cell)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
