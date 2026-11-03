@@ -77,3 +77,10 @@ td {
 th {
   background: #eef0f4;
 }
+.timing-bar {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 12px;
+}
