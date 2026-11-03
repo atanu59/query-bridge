@@ -38,6 +38,3 @@ def generate_sql(question):
     )
     return clean_sql(response.text)
 
-
-if __name__ == "__main__":
-    print(generate_sql("Which customers placed orders over 500?"))

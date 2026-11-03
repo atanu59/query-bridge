@@ -59,7 +59,3 @@ def get_schema_text():
         lines.append(f"{table}.{column} references {f_table}.{f_column}")
 
     return "\n".join(lines)
-
-
-if __name__ == "__main__":
-    print(get_schema_text())

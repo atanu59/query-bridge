@@ -7,7 +7,6 @@ FORBIDDEN_WORDS = [
 
 
 def validate_sql(sql):
-    """Returns (True, clean_sql) if safe, or (False, reason) if not."""
 
     if sql.strip() == "CANNOT_ANSWER":
         return False, "This question can't be answered from the database."
@@ -27,15 +26,3 @@ def validate_sql(sql):
             return False, f"Forbidden keyword found: {word}"
 
     return True, cleaned
-
-
-if __name__ == "__main__":
-    tests = [
-        "SELECT * FROM customers;",
-        "DELETE FROM customers;",
-        "SELECT * FROM customers; DROP TABLE orders;",
-        "WITH x AS (DELETE FROM orders RETURNING *) SELECT * FROM x",
-        "CANNOT_ANSWER",
-    ]
-    for t in tests:
-        print(t, "->", validate_sql(t))
