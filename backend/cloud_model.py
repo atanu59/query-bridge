@@ -7,7 +7,7 @@ load_dotenv()
 
 client = genai.Client(
     api_key=os.getenv("AI_API_KEY"),
-    http_options=types.HttpOptions(timeout=15000), 
+    http_options=types.HttpOptions(timeout=30000), 
 )
 
 
