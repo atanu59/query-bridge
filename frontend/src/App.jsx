@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./App.css";
-import TimingBar from "./TimingBar";
 
 const API_URL = "http://127.0.0.1:5000/api/query";
 
@@ -10,8 +9,6 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [timings, setTimings] = useState(null);
-  const [roundTrip, setRoundTrip] = useState(0);
 
   async function runQuery(q) {
     if (!q.trim()) {
@@ -22,8 +19,6 @@ function App() {
     setError("");
     setResult(null);
     setLastQuestion(q);
-    setTimings(null);
-    const t0 = performance.now();
 
     try {
       const response = await fetch(API_URL, {
@@ -32,8 +27,6 @@ function App() {
         body: JSON.stringify({ question: q }),
       });
       const data = await response.json();
-      setRoundTrip(Math.round(performance.now() - t0));
-      setTimings(data.timings);
       if (data.ok) {
         setResult(data);
       } else {
@@ -52,7 +45,6 @@ function App() {
     setLastQuestion("");
     setResult(null);
     setError("");
-    setTimings(null);
   }
 
   return (
@@ -67,7 +59,7 @@ function App() {
           placeholder="e.g. Which customers placed orders over 500?"
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && runQuery(question)}
-          />
+        />
         <button onClick={() => runQuery(question)} disabled={loading}>
           {loading ? "Running..." : "Run"}
         </button>
@@ -111,7 +103,6 @@ function App() {
           </table>
         </div>
       )}
-      {timings && !loading && <TimingBar timings={timings} roundTrip={roundTrip} />}
     </div>
   );
 }
