@@ -4,7 +4,6 @@ def get_schema_text():
     conn = get_connection()
     cur = conn.cursor()
 
-    # 1. All columns of all tables in the public schema
     cur.execute("""
         SELECT table_name, column_name, data_type
         FROM information_schema.columns
@@ -13,7 +12,6 @@ def get_schema_text():
     """)
     columns = cur.fetchall()
 
-    # 2. Foreign key relationships
     cur.execute("""
         SELECT
             tc.table_name, kcu.column_name,
@@ -31,7 +29,6 @@ def get_schema_text():
     cur.close()
     conn.close()
 
-    # 3. Build a readable text description
     tables = {}
     for table, column, dtype in columns:
         tables.setdefault(table, []).append(f"{column} ({dtype})")
